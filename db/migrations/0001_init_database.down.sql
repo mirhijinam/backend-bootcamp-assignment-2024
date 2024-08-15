@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS houses;
+
+DROP TABLE IF EXISTS flats;
+DROP TYPE IF EXISTS flat_status;
+
+DROP TABLE IF EXISTS users;
+DROP TYPE IF EXISTS user_role;
+
+DROP TABLE IF EXISTS subscriptions;
+
+DROP TABLE IF EXISTS notifications;
+DROP TYPE IF EXISTS notification_status;
