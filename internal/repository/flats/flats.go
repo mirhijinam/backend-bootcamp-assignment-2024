@@ -40,6 +40,8 @@ func (r Repo) Create(
 ) (models.Flat, error) {
 	const op = `repo.Flats.Create`
 
+	// todo: удостовериться, что у нас не будет состояния гонки при попытке задать номер для квартиры
+
 	builder := r.builder.
 		Insert("flats").
 		Columns(

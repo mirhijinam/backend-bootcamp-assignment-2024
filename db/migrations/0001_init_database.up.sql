@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS houses (
     id SERIAL PRIMARY KEY,
-    address TEXT NOT NULL,
+    address TEXT UNIQUE NOT NULL,
     year INTEGER NOT NULL,
     developer TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -23,7 +23,7 @@ CREATE TYPE user_role AS enum ('moderator', 'client');
 
 CREATE TABLE IF NOT EXISTS users (
     id UUID NOT NULL,
-    email TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
     role user_role NOT NULL
 );
