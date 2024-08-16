@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
 	"go.uber.org/zap"
@@ -27,7 +28,7 @@ func New(pool *pgxpool.Pool, logger *zap.Logger) Repo {
 func (r Repo) RegisterUser(
 	ctx context.Context,
 	userToAdd models.User,
-) (models.User, error) {
+) (uuid.UUID, error) {
 	const op = `repo.Auth.RegisterUser`
 
 	builder := r.builder.
@@ -45,24 +46,21 @@ func (r Repo) RegisterUser(
 			userToAdd.Role,
 		).
 		Suffix(
-			"RETURNING id, email, password, role",
+			"RETURNING id",
 		)
 
 	sql, args, err := builder.ToSql()
 	if err != nil {
-		return models.User{}, fmt.Errorf("%s: %w", op, err)
+		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	var user models.User
+	var userID uuid.UUID
 	err = r.pool.QueryRow(ctx, sql, args...).Scan(
-		&user.ID,
-		&user.Email,
-		&user.Password,
-		&user.Role,
+		&userID,
 	)
 	if err != nil {
-		return models.User{}, fmt.Errorf("%s: %w", op, err)
+		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return user, nil
+	return userID, nil
 }

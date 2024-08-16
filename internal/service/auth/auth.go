@@ -11,7 +11,7 @@ import (
 )
 
 type authRepo interface {
-	RegisterUser(ctx context.Context, flat models.User) (models.User, error)
+	RegisterUser(ctx context.Context, flat models.User) (uuid.UUID, error)
 }
 
 type Service struct {
@@ -29,12 +29,12 @@ func New(hr authRepo, logger *zap.Logger) Service {
 func (s Service) RegisterUser(
 	ctx context.Context,
 	draftUser dto.NewUser,
-) (models.User, error) {
+) (uuid.UUID, error) {
 
 	hashed, err := password.HashPassword(draftUser.Password)
 	if err != nil {
 		s.logger.Error("failed to hash password", zap.Error(err))
-		return models.User{}, err
+		return uuid.Nil, err
 	}
 
 	var user models.User

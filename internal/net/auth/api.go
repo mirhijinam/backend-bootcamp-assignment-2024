@@ -3,13 +3,13 @@ package auth
 import (
 	"context"
 
-	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
+	"github.com/google/uuid"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models/dto"
 	"go.uber.org/zap"
 )
 
 type service interface {
-	RegisterUser(ctx context.Context, draftUser dto.NewUser) (models.User, error)
+	RegisterUser(ctx context.Context, draftUser dto.NewUser) (uuid.UUID, error)
 }
 
 type API struct {
