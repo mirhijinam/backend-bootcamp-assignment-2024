@@ -8,38 +8,54 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models/dto"
+	"go.uber.org/zap"
 )
 
 type Repo struct {
 	pool    *pgxpool.Pool
 	builder sq.StatementBuilderType
+	logger  *zap.Logger
 }
 
-func New(pool *pgxpool.Pool) Repo {
+func New(pool *pgxpool.Pool, logger *zap.Logger) Repo {
 	return Repo{
 		pool:    pool,
 		builder: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
+		logger:  logger,
 	}
 }
 
 func (r Repo) Create(
 	ctx context.Context,
-	dtoHouse dto.NewHouse,
+	draftHouse dto.NewHouse,
 ) (models.House, error) {
 	const op = `repo.House.Create`
-	query := `
-		INSERT INTO houses (address, year, developer)
-		VALUES ($1, $2, $3)
-		RETURNING id, address, year, developer, created_at, update_at
-	`
+
+	builder := r.builder.
+		Insert("houses").
+		Columns(
+			"address",
+			"year",
+			"developer",
+		).
+		Values(
+			draftHouse.Address,
+			draftHouse.Year,
+			draftHouse.Developer,
+		).
+		Suffix(
+			"RETURNING id, address, year, developer, created_at, update_at",
+		)
+
+	sql, args, err := builder.ToSql()
+	if err != nil {
+		return models.House{}, fmt.Errorf("%s: %w", op, err)
+	}
+
+	r.logger.Info(op, zap.Any("sql request", sql))
+
 	var house models.House
-	err := r.pool.QueryRow(
-		ctx,
-		query,
-		dtoHouse.Address,
-		dtoHouse.Year,
-		dtoHouse.Developer,
-	).Scan(
+	err = r.pool.QueryRow(ctx, sql, args...).Scan(
 		&house.ID,
 		&house.Address,
 		&house.Year,
@@ -47,7 +63,6 @@ func (r Repo) Create(
 		&house.CreatedAt,
 		&house.UpdateAt,
 	)
-
 	if err != nil {
 		return models.House{}, fmt.Errorf("%s: %w", op, err)
 	}

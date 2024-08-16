@@ -416,52 +416,6 @@ func (o OptDate) Or(d Date) Date {
 	return d
 }
 
-// NewOptEmail returns new OptEmail with value set to v.
-func NewOptEmail(v Email) OptEmail {
-	return OptEmail{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEmail is optional Email.
-type OptEmail struct {
-	Value Email
-	Set   bool
-}
-
-// IsSet returns true if OptEmail was set.
-func (o OptEmail) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEmail) Reset() {
-	var v Email
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEmail) SetTo(v Email) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEmail) Get() (v Email, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEmail) Or(d Email) Email {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptFlatCreatePostReq returns new OptFlatCreatePostReq with value set to v.
 func NewOptFlatCreatePostReq(v FlatCreatePostReq) OptFlatCreatePostReq {
 	return OptFlatCreatePostReq{
@@ -1077,52 +1031,6 @@ func (o OptUserId) Or(d UserId) UserId {
 	return d
 }
 
-// NewOptUserType returns new OptUserType with value set to v.
-func NewOptUserType(v UserType) OptUserType {
-	return OptUserType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptUserType is optional UserType.
-type OptUserType struct {
-	Value UserType
-	Set   bool
-}
-
-// IsSet returns true if OptUserType was set.
-func (o OptUserType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptUserType) Reset() {
-	var v UserType
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptUserType) SetTo(v UserType) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptUserType) Get() (v UserType, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptUserType) Or(d UserType) UserType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 type Password string
 
 type Price int
@@ -1243,38 +1151,38 @@ func (s *RegisterPostOK) SetUserID(val OptUserId) {
 func (*RegisterPostOK) registerPostRes() {}
 
 type RegisterPostReq struct {
-	Email    OptEmail    `json:"email"`
-	Password OptPassword `json:"password"`
-	UserType OptUserType `json:"user_type"`
+	Email    Email    `json:"email"`
+	Password Password `json:"password"`
+	UserType UserType `json:"user_type"`
 }
 
 // GetEmail returns the value of Email.
-func (s *RegisterPostReq) GetEmail() OptEmail {
+func (s *RegisterPostReq) GetEmail() Email {
 	return s.Email
 }
 
 // GetPassword returns the value of Password.
-func (s *RegisterPostReq) GetPassword() OptPassword {
+func (s *RegisterPostReq) GetPassword() Password {
 	return s.Password
 }
 
 // GetUserType returns the value of UserType.
-func (s *RegisterPostReq) GetUserType() OptUserType {
+func (s *RegisterPostReq) GetUserType() UserType {
 	return s.UserType
 }
 
 // SetEmail sets the value of Email.
-func (s *RegisterPostReq) SetEmail(val OptEmail) {
+func (s *RegisterPostReq) SetEmail(val Email) {
 	s.Email = val
 }
 
 // SetPassword sets the value of Password.
-func (s *RegisterPostReq) SetPassword(val OptPassword) {
+func (s *RegisterPostReq) SetPassword(val Password) {
 	s.Password = val
 }
 
 // SetUserType sets the value of UserType.
-func (s *RegisterPostReq) SetUserType(val OptUserType) {
+func (s *RegisterPostReq) SetUserType(val UserType) {
 	s.UserType = val
 }
 

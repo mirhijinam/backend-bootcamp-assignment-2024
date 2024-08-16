@@ -3,7 +3,6 @@ package houses
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/generated"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
@@ -20,7 +19,7 @@ func (api API) HouseIDGet(
 		return nil, errors.New("failed to get user from context")
 	}
 
-	fmt.Println(user.ID, user.Role)
+	api.logger.Info("flat list requester (info from context):", zap.Any("userID", user.ID), zap.Any("userRole", user.Role))
 
 	intermediateFlats, err := api.service.GetFlatsByHouseId(ctx, int(params.ID), models.Role(user.Role))
 	if err != nil {

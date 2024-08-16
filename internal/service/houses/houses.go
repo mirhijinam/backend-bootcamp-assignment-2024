@@ -5,6 +5,7 @@ import (
 
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models/dto"
+	"go.uber.org/zap"
 )
 
 type houseRepo interface {
@@ -14,11 +15,13 @@ type houseRepo interface {
 
 type Service struct {
 	houseRepo houseRepo
+	logger    *zap.Logger
 }
 
-func New(hr houseRepo) Service {
+func New(hr houseRepo, logger *zap.Logger) Service {
 	return Service{
 		houseRepo: hr,
+		logger:    logger,
 	}
 }
 

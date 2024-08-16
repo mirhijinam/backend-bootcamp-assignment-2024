@@ -4,9 +4,31 @@ import (
 	"context"
 
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/generated"
-	ht "github.com/ogen-go/ogen/http"
+	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
+	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models/dto"
+	"go.uber.org/zap"
 )
 
-func (api API) RegisterPost(ctx context.Context, req generated.OptRegisterPostReq) (r generated.RegisterPostRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (api API) RegisterPost(
+	ctx context.Context,
+	req generated.OptRegisterPostReq,
+) (r generated.RegisterPostRes, _ error) {
+	user, err := api.service.RegisterUser(ctx, dto.NewUser{
+		Email:    string(req.Value.Email),
+		Password: string(req.Value.Password),
+		Role:     models.Role(req.Value.UserType),
+	})
+	if err != nil {
+		api.logger.Error("failed to register user", zap.Error(err))
+		return &generated.RegisterPostBadRequest{}, err
+	}
+
+	api.logger.Info("registered user", zap.Any("id", user.ID))
+
+	return &generated.RegisterPostOK{
+		UserID: generated.OptUserId{
+			Value: generated.UserId(user.ID),
+			Set:   true,
+		},
+	}, nil
 }

@@ -73,6 +73,10 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - email
+                - password
+                - user_type
               properties:
                 email:
                   $ref: '#/components/schemas/Email'

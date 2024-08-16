@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models/dto"
+	"go.uber.org/zap"
 )
 
 // newFlatNumberQuery - запрос для получения нового номера квартиры с учетом последней добавленной в дом.
@@ -22,12 +23,14 @@ const newFlatNumberQuery = `
 type Repo struct {
 	pool    *pgxpool.Pool
 	builder sq.StatementBuilderType
+	logger  *zap.Logger
 }
 
-func New(pool *pgxpool.Pool) Repo {
+func New(pool *pgxpool.Pool, logger *zap.Logger) Repo {
 	return Repo{
 		pool:    pool,
 		builder: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
+		logger:  logger,
 	}
 }
 
@@ -60,7 +63,7 @@ func (r Repo) Create(
 		return models.Flat{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	fmt.Println(sql)
+	r.logger.Info(op, zap.Any("sql request", sql))
 
 	var flat models.Flat
 	err = r.pool.QueryRow(ctx, sql, args...).Scan(

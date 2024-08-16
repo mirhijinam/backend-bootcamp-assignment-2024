@@ -23,7 +23,7 @@ func (api API) DummyLoginGet(
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expirationTime)),
 		},
 		User: models.UserClaims{
-			ID:   uuid.NewString(),
+			ID:   uuid.New(),
 			Role: models.Role(params.UserType),
 		},
 	})

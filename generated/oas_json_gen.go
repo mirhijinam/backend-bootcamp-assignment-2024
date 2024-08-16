@@ -1384,39 +1384,6 @@ func (s *OptDate) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes Email as json.
-func (o OptEmail) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes Email from json.
-func (o *OptEmail) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptEmail to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptEmail) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptEmail) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes FlatCreatePostReq as json.
 func (o OptFlatCreatePostReq) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -1866,39 +1833,6 @@ func (s *OptUserId) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes UserType as json.
-func (o OptUserType) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes UserType from json.
-func (o *OptUserType) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptUserType to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptUserType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptUserType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes Password as json.
 func (s Password) Encode(e *jx.Encoder) {
 	unwrapped := string(s)
@@ -2182,22 +2116,16 @@ func (s *RegisterPostReq) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *RegisterPostReq) encodeFields(e *jx.Encoder) {
 	{
-		if s.Email.Set {
-			e.FieldStart("email")
-			s.Email.Encode(e)
-		}
+		e.FieldStart("email")
+		s.Email.Encode(e)
 	}
 	{
-		if s.Password.Set {
-			e.FieldStart("password")
-			s.Password.Encode(e)
-		}
+		e.FieldStart("password")
+		s.Password.Encode(e)
 	}
 	{
-		if s.UserType.Set {
-			e.FieldStart("user_type")
-			s.UserType.Encode(e)
-		}
+		e.FieldStart("user_type")
+		s.UserType.Encode(e)
 	}
 }
 
@@ -2212,12 +2140,13 @@ func (s *RegisterPostReq) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode RegisterPostReq to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "email":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Email.Reset()
 				if err := s.Email.Decode(d); err != nil {
 					return err
 				}
@@ -2226,8 +2155,8 @@ func (s *RegisterPostReq) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"email\"")
 			}
 		case "password":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Password.Reset()
 				if err := s.Password.Decode(d); err != nil {
 					return err
 				}
@@ -2236,8 +2165,8 @@ func (s *RegisterPostReq) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"password\"")
 			}
 		case "user_type":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.UserType.Reset()
 				if err := s.UserType.Decode(d); err != nil {
 					return err
 				}
@@ -2251,6 +2180,38 @@ func (s *RegisterPostReq) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode RegisterPostReq")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfRegisterPostReq) {
+					name = jsonFieldsNameOfRegisterPostReq[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil

@@ -357,15 +357,8 @@ func (s *RegisterPostReq) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Email.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.Email.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -375,15 +368,8 @@ func (s *RegisterPostReq) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.UserType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.UserType.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {

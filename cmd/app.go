@@ -11,10 +11,12 @@ import (
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/net/middleware"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/pkg/db"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/pkg/logger"
+	authrepo "github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/repository/auth"
 	flatsrepo "github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/repository/flats"
 	houserepo "github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/repository/houses"
+	authservice "github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/service/auth"
 	flatsservice "github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/service/flats"
-	houseservice "github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/service/houses"
+	housesservice "github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/service/houses"
 	"go.uber.org/zap"
 )
 
@@ -24,26 +26,27 @@ func Run() {
 		panic(err)
 	}
 
+	lgr := logger.New(cfg.LoggerConfig.Mode, cfg.LoggerConfig.Filepath)
+	defer lgr.Sync()
+
 	pool, err := db.MustOpenDB(context.Background(), cfg.DBConfig)
 	if err != nil {
 		panic(err)
 	}
 
-	houseService := houseservice.New(
-		houserepo.New(pool),
-	)
+	authService := authservice.New(
+		authrepo.New(pool, lgr), lgr)
+
+	houseService := housesservice.New(
+		houserepo.New(pool, lgr), lgr)
 
 	flatsService := flatsservice.New(
-		flatsrepo.New(pool),
-	)
-
-	lgr := logger.New(cfg.LoggerConfig.Mode, cfg.LoggerConfig.Filepath)
-	defer lgr.Sync()
+		flatsrepo.New(pool, lgr), lgr)
 
 	authMiddl := middleware.New(lgr)
 
 	server, err := generated.NewServer(
-		net.NewHandler(houseService, flatsService, lgr),
+		net.NewHandler(authService, houseService, flatsService, lgr),
 		authMiddl,
 	)
 	if err != nil {
