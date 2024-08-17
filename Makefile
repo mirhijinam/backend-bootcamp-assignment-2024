@@ -13,3 +13,6 @@ down:
 
 clean:
 	${_COMPOSE} down --remove-orphans -v --rmi all
+
+generate:
+	go generate ./...

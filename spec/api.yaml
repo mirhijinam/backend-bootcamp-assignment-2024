@@ -218,10 +218,13 @@ paths:
             schema:
               type: object
               required:
+                - number
                 - house_id
                 - price
                 - rooms
               properties:
+                number:
+                  $ref: '#/components/schemas/FlatId'
                 house_id:
                   $ref: '#/components/schemas/HouseId'
                 price:
@@ -256,11 +259,13 @@ paths:
               type: object
               required:
                 - id
-                - price
-                - room
+                - house_id
+                - status
               properties:
                 id:
                   $ref: '#/components/schemas/FlatId'
+                house_id:
+                  $ref: '#/components/schemas/HouseId'
                 status:
                   $ref: '#/components/schemas/Status'
       responses:
@@ -280,6 +285,17 @@ components:
   responses:
     '400':
       description: Невалидные данные ввода
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                description: Текст бизнесовой ошибки
+                type: string
+                example: 'some business error'
     '401':
       description: Неавторизованный доступ
     5xx:

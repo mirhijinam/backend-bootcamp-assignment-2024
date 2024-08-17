@@ -111,9 +111,15 @@ func (*Flat) flatCreatePostRes() {}
 func (*Flat) flatUpdatePostRes() {}
 
 type FlatCreatePostReq struct {
+	Number  FlatId  `json:"number"`
 	HouseID HouseId `json:"house_id"`
 	Price   Price   `json:"price"`
 	Rooms   Rooms   `json:"rooms"`
+}
+
+// GetNumber returns the value of Number.
+func (s *FlatCreatePostReq) GetNumber() FlatId {
+	return s.Number
 }
 
 // GetHouseID returns the value of HouseID.
@@ -129,6 +135,11 @@ func (s *FlatCreatePostReq) GetPrice() Price {
 // GetRooms returns the value of Rooms.
 func (s *FlatCreatePostReq) GetRooms() Rooms {
 	return s.Rooms
+}
+
+// SetNumber sets the value of Number.
+func (s *FlatCreatePostReq) SetNumber(val FlatId) {
+	s.Number = val
 }
 
 // SetHouseID sets the value of HouseID.
@@ -149,8 +160,9 @@ func (s *FlatCreatePostReq) SetRooms(val Rooms) {
 type FlatId int
 
 type FlatUpdatePostReq struct {
-	ID     FlatId    `json:"id"`
-	Status OptStatus `json:"status"`
+	ID      FlatId  `json:"id"`
+	HouseID HouseId `json:"house_id"`
+	Status  Status  `json:"status"`
 }
 
 // GetID returns the value of ID.
@@ -158,8 +170,13 @@ func (s *FlatUpdatePostReq) GetID() FlatId {
 	return s.ID
 }
 
+// GetHouseID returns the value of HouseID.
+func (s *FlatUpdatePostReq) GetHouseID() HouseId {
+	return s.HouseID
+}
+
 // GetStatus returns the value of Status.
-func (s *FlatUpdatePostReq) GetStatus() OptStatus {
+func (s *FlatUpdatePostReq) GetStatus() Status {
 	return s.Status
 }
 
@@ -168,8 +185,13 @@ func (s *FlatUpdatePostReq) SetID(val FlatId) {
 	s.ID = val
 }
 
+// SetHouseID sets the value of HouseID.
+func (s *FlatUpdatePostReq) SetHouseID(val HouseId) {
+	s.HouseID = val
+}
+
 // SetStatus sets the value of Status.
-func (s *FlatUpdatePostReq) SetStatus(val OptStatus) {
+func (s *FlatUpdatePostReq) SetStatus(val Status) {
 	s.Status = val
 }
 
@@ -847,52 +869,6 @@ func (o OptRegisterPostReq) Or(d RegisterPostReq) RegisterPostReq {
 	return d
 }
 
-// NewOptStatus returns new OptStatus with value set to v.
-func NewOptStatus(v Status) OptStatus {
-	return OptStatus{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptStatus is optional Status.
-type OptStatus struct {
-	Value Status
-	Set   bool
-}
-
-// IsSet returns true if OptStatus was set.
-func (o OptStatus) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptStatus) Reset() {
-	var v Status
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptStatus) SetTo(v Status) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptStatus) Get() (v Status, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptStatus) Or(d Status) Status {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -1035,8 +1011,20 @@ type Password string
 
 type Price int
 
-// Ref: #/components/responses/400
-type R400 struct{}
+type R400 struct {
+	// Текст бизнесовой ошибки.
+	Message string `json:"message"`
+}
+
+// GetMessage returns the value of Message.
+func (s *R400) GetMessage() string {
+	return s.Message
+}
+
+// SetMessage sets the value of Message.
+func (s *R400) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*R400) flatCreatePostRes()       {}
 func (*R400) flatUpdatePostRes()       {}

@@ -7,6 +7,15 @@ CREATE TABLE IF NOT EXISTS houses (
     update_at TIMESTAMP
 );
 
+CREATE TYPE user_role AS enum ('moderator', 'client');
+
+CREATE TABLE IF NOT EXISTS users (
+    id UUID UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    role user_role NOT NULL
+);
+
 CREATE TYPE flat_status AS enum ('created', 'approved', 'declined', 'on_moderation');
 
 CREATE TABLE IF NOT EXISTS flats (
@@ -15,24 +24,16 @@ CREATE TABLE IF NOT EXISTS flats (
     price INTEGER NOT NULL,
     rooms INTEGER NOT NULL,
     status flat_status NOT NULL DEFAULT 'created',
+    moderator_id UUID, -- comment: в идеале прокидывать референс, но не будет работать dummyLogin
 
     CONSTRAINT house_flat_number_pk PRIMARY KEY (flat_number, house_id)
 );
-
-CREATE TYPE user_role AS enum ('moderator', 'client');
-
-CREATE TABLE IF NOT EXISTS users (
-    id UUID NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    role user_role NOT NULL
-);
-
 
 CREATE TABLE IF NOT EXISTS subscriptions (
     user_id UUID NOT NULL,
     house_id INTEGER NOT NULL REFERENCES houses(id)
 );
+
 CREATE TYPE notification_status AS enum ('pending', 'sended');
 
 CREATE TABLE IF NOT EXISTS notifications (

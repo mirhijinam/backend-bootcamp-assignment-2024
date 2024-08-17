@@ -2,14 +2,18 @@ package houses
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models/dto"
 	"go.uber.org/zap"
 )
+
+var ErrHouseNotExists = errors.New("house not exists")
 
 type Repo struct {
 	pool    *pgxpool.Pool
@@ -123,4 +127,67 @@ func (r Repo) GetFlatsByHouseId(
 	}
 
 	return flats, nil
+}
+
+func (r Repo) Update(
+	ctx context.Context,
+) error {
+	const op = `repo.House.Update`
+	builder := r.builder.
+		Update("houses").
+		Set("update_at", sq.Expr("CURRENT_TIMESTAMP"))
+
+	sql, args, err := builder.ToSql()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	_, err = r.pool.Exec(ctx, sql, args...)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (r Repo) GetHouseById(
+	ctx context.Context,
+	houseId int,
+) (models.House, error) {
+	const op = `repo.Houses.GetHouseById`
+
+	builder := r.builder.
+		Select(
+			"id",
+			"address",
+			"year",
+			"developer",
+			"created_at",
+			"update_at",
+		).
+		From("houses").
+		Where(sq.Eq{"id": houseId})
+
+	sql, args, err := builder.ToSql()
+	if err != nil {
+		return models.House{}, fmt.Errorf("%s: %w", op, err)
+	}
+
+	var house models.House
+	err = r.pool.QueryRow(ctx, sql, args...).Scan(
+		&house.ID,
+		&house.Address,
+		&house.Year,
+		&house.Developer,
+		&house.CreatedAt,
+		&house.UpdateAt,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return models.House{}, ErrHouseNotExists
+		}
+		return models.House{}, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return house, nil
 }

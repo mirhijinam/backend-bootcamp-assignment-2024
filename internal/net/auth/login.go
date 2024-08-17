@@ -7,6 +7,10 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
-func (api API) LoginPost(ctx context.Context, req generated.OptLoginPostReq) (r generated.LoginPostRes, _ error) {
+func (api API) LoginPost(
+	ctx context.Context,
+	req generated.OptLoginPostReq,
+) (r generated.LoginPostRes, _ error) {
+
 	return r, ht.ErrNotImplemented
 }

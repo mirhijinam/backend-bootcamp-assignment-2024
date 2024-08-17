@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	trmpgx "github.com/avito-tech/go-transaction-manager/drivers/pgxv5/v2"
+	"github.com/avito-tech/go-transaction-manager/trm/v2/manager"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/generated"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/config"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/net"
@@ -34,6 +36,7 @@ func Run() {
 		panic(err)
 	}
 
+	transactor := manager.Must(trmpgx.NewDefaultFactory(pool))
 	authService := authservice.New(
 		authrepo.New(pool, lgr), lgr)
 
@@ -41,7 +44,7 @@ func Run() {
 		houserepo.New(pool, lgr), lgr)
 
 	flatsService := flatsservice.New(
-		flatsrepo.New(pool, lgr), lgr)
+		flatsrepo.New(pool, lgr), houserepo.New(pool, lgr), lgr, transactor)
 
 	authMiddl := middleware.New(lgr)
 

@@ -30,18 +30,16 @@ func (s Service) RegisterUser(
 	ctx context.Context,
 	draftUser dto.NewUser,
 ) (uuid.UUID, error) {
-
 	hashed, err := password.HashPassword(draftUser.Password)
 	if err != nil {
 		s.logger.Error("failed to hash password", zap.Error(err))
 		return uuid.Nil, err
 	}
 
-	var user models.User
-	user.ID = uuid.New()
-	user.Email = draftUser.Email
-	user.Password = hashed
-	user.Role = draftUser.Role
-
-	return s.authRepo.RegisterUser(ctx, user)
+	return s.authRepo.RegisterUser(ctx, models.User{
+		ID:       uuid.New(),
+		Email:    draftUser.Email,
+		Password: hashed,
+		Role:     draftUser.Role,
+	})
 }

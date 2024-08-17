@@ -10,6 +10,7 @@ import (
 
 type service interface {
 	Create(ctx context.Context, draftFlat dto.NewFlat) (models.Flat, error)
+	UpdateStatus(ctx context.Context, params dto.FlatUpdateParams) (models.Flat, error)
 }
 
 type API struct {
