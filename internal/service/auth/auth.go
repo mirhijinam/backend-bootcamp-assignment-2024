@@ -2,16 +2,20 @@ package auth
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models/dto"
-	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/pkg/password"
+	pass "github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/pkg/password"
 	"go.uber.org/zap"
 )
 
+var ErrWrongPassword = errors.New("wrong password")
+
 type authRepo interface {
 	RegisterUser(ctx context.Context, flat models.User) (uuid.UUID, error)
+	LoginUser(ctx context.Context, userId uuid.UUID, userPass string) (models.User, error)
 }
 
 type Service struct {
@@ -30,7 +34,7 @@ func (s Service) RegisterUser(
 	ctx context.Context,
 	draftUser dto.NewUser,
 ) (uuid.UUID, error) {
-	hashed, err := password.HashPassword(draftUser.Password)
+	hashed, err := pass.HashPassword(draftUser.Password)
 	if err != nil {
 		s.logger.Error("failed to hash password", zap.Error(err))
 		return uuid.Nil, err
@@ -42,4 +46,22 @@ func (s Service) RegisterUser(
 		Password: hashed,
 		Role:     draftUser.Role,
 	})
+}
+
+func (s Service) LoginUser(
+	ctx context.Context,
+	userId uuid.UUID,
+	userPass string,
+) (models.User, error) {
+	user, err := s.authRepo.LoginUser(ctx, userId, userPass)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	ok := pass.CheckPassword(user.Password, userPass)
+	if !ok {
+		return models.User{}, ErrWrongPassword
+	}
+
+	return user, nil
 }

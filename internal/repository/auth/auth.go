@@ -8,20 +8,17 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
-	"go.uber.org/zap"
 )
 
 type Repo struct {
 	pool    *pgxpool.Pool
 	builder sq.StatementBuilderType
-	logger  *zap.Logger
 }
 
-func New(pool *pgxpool.Pool, logger *zap.Logger) Repo {
+func New(pool *pgxpool.Pool) Repo {
 	return Repo{
 		pool:    pool,
 		builder: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
-		logger:  logger,
 	}
 }
 
@@ -63,4 +60,40 @@ func (r Repo) RegisterUser(
 	}
 
 	return userID, nil
+}
+
+func (r Repo) LoginUser(
+	ctx context.Context,
+	userId uuid.UUID,
+	userPass string,
+) (models.User, error) {
+	const op = `repo.Auth.LoginUser`
+
+	builder := r.builder.
+		Select(
+			"id",
+			"email",
+			"password",
+			"role",
+		).
+		From("users").
+		Where(sq.Eq{"id": userId})
+
+	sql, args, err := builder.ToSql()
+	if err != nil {
+		return models.User{}, fmt.Errorf("%s: %w", op, err)
+	}
+
+	var user models.User
+	err = r.pool.QueryRow(ctx, sql, args...).Scan(
+		&user.ID,
+		&user.Email,
+		&user.Password,
+		&user.Role,
+	)
+	if err != nil {
+		return models.User{}, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return user, nil
 }

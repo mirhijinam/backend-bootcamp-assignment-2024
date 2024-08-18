@@ -38,13 +38,13 @@ func Run() {
 
 	transactor := manager.Must(trmpgx.NewDefaultFactory(pool))
 	authService := authservice.New(
-		authrepo.New(pool, lgr), lgr)
+		authrepo.New(pool), lgr)
 
 	houseService := housesservice.New(
-		houserepo.New(pool, lgr), lgr)
+		houserepo.New(pool), lgr)
 
 	flatsService := flatsservice.New(
-		flatsrepo.New(pool, lgr), houserepo.New(pool, lgr), lgr, transactor)
+		flatsrepo.New(pool), houserepo.New(pool), lgr, transactor)
 
 	authMiddl := middleware.New(lgr)
 

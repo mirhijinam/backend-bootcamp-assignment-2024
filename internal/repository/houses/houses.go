@@ -10,7 +10,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models/dto"
-	"go.uber.org/zap"
 )
 
 var ErrHouseNotExists = errors.New("house not exists")
@@ -18,14 +17,12 @@ var ErrHouseNotExists = errors.New("house not exists")
 type Repo struct {
 	pool    *pgxpool.Pool
 	builder sq.StatementBuilderType
-	logger  *zap.Logger
 }
 
-func New(pool *pgxpool.Pool, logger *zap.Logger) Repo {
+func New(pool *pgxpool.Pool) Repo {
 	return Repo{
 		pool:    pool,
 		builder: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
-		logger:  logger,
 	}
 }
 
@@ -56,7 +53,7 @@ func (r Repo) Create(
 		return models.House{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	r.logger.Info(op, zap.Any("sql request", sql))
+	fmt.Printf("%s: sql request = %s", op, sql)
 
 	var house models.House
 	err = r.pool.QueryRow(ctx, sql, args...).Scan(

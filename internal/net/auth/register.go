@@ -20,10 +20,8 @@ func (api API) RegisterPost(
 	})
 	if err != nil {
 		api.logger.Error("failed to register user", zap.Error(err))
-		return &generated.RegisterPostBadRequest{}, err
+		return &generated.RegisterPostBadRequest{}, nil
 	}
-
-	api.logger.Info("registered user", zap.Any("id", userID))
 
 	return &generated.RegisterPostOK{
 		UserID: generated.OptUserId{
