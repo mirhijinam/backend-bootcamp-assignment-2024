@@ -17,7 +17,6 @@ func (api API) LoginPost(
 	ctx context.Context,
 	req generated.OptLoginPostReq,
 ) (r generated.LoginPostRes, _ error) {
-
 	user, err := api.service.LoginUser(ctx, uuid.UUID(req.Value.ID.Value), string(req.Value.Password.Value))
 	if err != nil {
 		if errors.Is(err, auth.ErrWrongPassword) {
