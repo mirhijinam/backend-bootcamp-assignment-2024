@@ -2,12 +2,14 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/generated"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
+	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/service/auth"
 	"go.uber.org/zap"
 )
 
@@ -18,6 +20,9 @@ func (api API) LoginPost(
 
 	user, err := api.service.LoginUser(ctx, uuid.UUID(req.Value.ID.Value), string(req.Value.Password.Value))
 	if err != nil {
+		if errors.Is(err, auth.ErrWrongPassword) {
+			return &generated.LoginPostNotFound{}, nil
+		}
 		api.logger.Error("failed to register user", zap.Error(err))
 		return &generated.LoginPostBadRequest{}, nil
 	}
