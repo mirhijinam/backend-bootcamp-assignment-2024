@@ -3,11 +3,11 @@ _COMPOSE_TEST=docker compose -f tests/docker-compose-test.yaml --env-file tests/
 
 up:
 	@echo "Starting Docker images..."
-	${_COMPOSE} up
+	${_COMPOSE} up -d
 
 up_test:
 	@echo "Starting Docker images..."
-	${_COMPOSE_TEST} up
+	${_COMPOSE_TEST} up -d
 	
 build:
 	@echo "Building Docker images..."
