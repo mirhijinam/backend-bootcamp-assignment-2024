@@ -16,3 +16,17 @@ clean:
 
 generate:
 	go generate ./...
+
+cover:
+	go test -coverprofile=coverage.out ./...
+	go tool cover -func=coverage.out
+	rm coverage.out
+
+cover-html:
+	go test -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out
+	rm coverage.out
+
+mockgen:
+	mockgen -source=internal/service/houses/houses.go   -destination=internal/service/houses/houses_mocks_test.go -package=houses
+	mockgen -source=internal/service/flats/flats.go   -destination=internal/service/flats/flats_mocks_test.go -package=flats

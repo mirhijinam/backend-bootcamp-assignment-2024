@@ -16,12 +16,14 @@ type userKey string
 const User userKey = "user"
 
 type Middleware struct {
-	logger *zap.Logger
+	logger    *zap.Logger
+	secretKey string
 }
 
-func New(logger *zap.Logger) Middleware {
+func New(logger *zap.Logger, secretKey string) Middleware {
 	return Middleware{
-		logger: logger,
+		logger:    logger,
+		secretKey: secretKey,
 	}
 }
 
@@ -30,13 +32,13 @@ func (m Middleware) HandleBearerAuth(
 	operationName string,
 	t generated.BearerAuth,
 ) (context.Context, error) {
-	m.logger.Info("TOKEN:", zap.Any("token", t.Token))
-
 	token, err := jwt.ParseWithClaims(t.GetToken(), &models.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte("secret"), nil // todo: add secret in config
+
+		// todo: add secret in config
+		return []byte(m.secretKey), nil
 	})
 
 	if err != nil {
@@ -56,6 +58,8 @@ func (m Middleware) HandleBearerAuth(
 			ID:   claims.User.ID,
 			Role: claims.User.Role,
 		})
+
+	m.logger.Info("USER_ID:", zap.Any("user_id", claims.User.ID))
 
 	return ctx, err
 }

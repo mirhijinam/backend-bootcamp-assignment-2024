@@ -22,10 +22,10 @@ type Handler struct {
 	authAPI
 }
 
-func NewHandler(authService auth.Service, houseService houses.Service, flatService flats.Service, logger *zap.Logger) Handler {
+func NewHandler(authService auth.Service, houseService houses.Service, flatService flats.Service, logger *zap.Logger, secretKey string) Handler {
 	return Handler{
 		houseAPI: housesapi.New(houseService, logger),
 		flatAPI:  flatsapi.New(flatService, logger),
-		authAPI:  authapi.New(authService, logger),
+		authAPI:  authapi.New(authService, logger, secretKey),
 	}
 }

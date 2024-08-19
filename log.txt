@@ -1,0 +1,5 @@
+2024-08-19T01:38:38.275+0300	info	cmd/app.go:59	Server is running	{"port": "8080"}
+2024-08-19T02:32:55.420+0300	info	cmd/app.go:59	Server is running	{"port": "8080"}
+2024-08-19T04:34:43.006+0300	info	cmd/app.go:59	Server is running	{"port": "8080"}
+2024-08-19T04:35:31.204+0300	info	cmd/app.go:59	Server is running	{"port": "8080"}
+2024-08-19T04:36:05.299+0300	info	cmd/app.go:59	Server is running	{"port": "8080"}

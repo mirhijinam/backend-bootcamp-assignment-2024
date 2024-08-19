@@ -4,15 +4,21 @@ import (
 	"context"
 	"errors"
 
-	"github.com/avito-tech/go-transaction-manager/trm/v2/manager"
 	"github.com/google/uuid"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models/dto"
 	"go.uber.org/zap"
 )
 
-var ErrAnotherModerating = errors.New("another moderating")
-var ErrAlreadyModerated = errors.New("already moderated")
+var (
+	ErrAnotherModerating = errors.New("another moderating")
+	ErrAlreadyModerated  = errors.New("already moderated")
+	ErrInvalidTransition = errors.New("invalid flat status transition")
+)
+
+type transactor interface {
+	Do(ctx context.Context, fn func(ctx context.Context) error) (err error)
+}
 
 type flatsRepo interface {
 	Create(ctx context.Context, flat dto.NewFlat) (models.Flat, error)
@@ -29,10 +35,10 @@ type Service struct {
 	flatsRepo  flatsRepo
 	housesRepo housesRepo
 	logger     *zap.Logger
-	transactor *manager.Manager
+	transactor transactor
 }
 
-func New(fr flatsRepo, hr housesRepo, logger *zap.Logger, transactor *manager.Manager) Service {
+func New(fr flatsRepo, hr housesRepo, logger *zap.Logger, transactor transactor) Service {
 	return Service{
 		flatsRepo:  fr,
 		housesRepo: hr,
@@ -92,7 +98,10 @@ func (s Service) UpdateStatus(
 			return ErrAnotherModerating
 		}
 
-		// todo: добавить state machine для проверки статус-переходов
+		if !CanStatusTransition(flat.Status, params.Status) {
+			return ErrInvalidTransition
+		}
+
 		status, moderatorId, err := s.flatsRepo.UpdateStatus(ctx, params)
 		if err != nil {
 			return err
@@ -111,4 +120,17 @@ func (s Service) UpdateStatus(
 	})
 
 	return updatedFlat, err
+}
+
+func CanStatusTransition(prev, next models.Status) bool {
+	switch {
+	case prev == models.StatusCreated && next == models.StatusOnModeration:
+		return true
+	case prev == models.StatusOnModeration && next == models.StatusDeclined:
+		return true
+	case prev == models.StatusOnModeration && next == models.StatusApproved:
+		return true
+	}
+
+	return false
 }

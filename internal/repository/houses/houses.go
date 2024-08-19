@@ -7,19 +7,25 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models/dto"
 )
 
 var ErrHouseNotExists = errors.New("house not exists")
 
+type PgxIface interface {
+	QueryRow(ctx context.Context, sql string, args ...interface{}) pgx.Row
+	Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error)
+	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
+}
+
 type Repo struct {
-	pool    *pgxpool.Pool
+	pool    PgxIface
 	builder sq.StatementBuilderType
 }
 
-func New(pool *pgxpool.Pool) Repo {
+func New(pool PgxIface) Repo {
 	return Repo{
 		pool:    pool,
 		builder: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
@@ -90,7 +96,7 @@ func (r Repo) GetFlatsByHouseId(
 		Where(sq.Eq{"house_id": houseId})
 
 	if role == models.RoleClient {
-		builder = builder.Where(sq.Eq{"status": "approved"}) // todo: create consts
+		builder = builder.Where(sq.Eq{"status": models.StatusApproved})
 	}
 
 	sql, args, err := builder.ToSql()

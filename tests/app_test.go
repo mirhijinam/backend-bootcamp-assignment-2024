@@ -1,18 +1,20 @@
-package cmd
+package tests
 
 import (
 	"context"
-	"fmt"
-	"net/http"
+	"net/http/httptest"
+	"testing"
 
 	trmpgx "github.com/avito-tech/go-transaction-manager/drivers/pgxv5/v2"
 	"github.com/avito-tech/go-transaction-manager/trm/v2/manager"
+	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/lamoda/gonkey/fixtures"
+	"github.com/lamoda/gonkey/runner"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/generated"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/config"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/net"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/net/middleware"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/pkg/db"
-	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/pkg/logger"
 	authrepo "github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/repository/auth"
 	flatsrepo "github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/repository/flats"
 	houserepo "github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/repository/houses"
@@ -22,18 +24,20 @@ import (
 	"go.uber.org/zap"
 )
 
-func Run() {
+func TestFuncCases(t *testing.T) {
 	cfg, err := config.New()
 	if err != nil {
 		panic(err)
 	}
 
-	lgr := logger.New(cfg.LoggerConfig.Mode, cfg.LoggerConfig.Filepath)
-	defer lgr.Sync()
-
 	pool, err := db.MustOpenDB(context.Background(), cfg.DBConfig)
 	if err != nil {
 		panic(err)
+	}
+
+	lgr, err := zap.NewDevelopment()
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	transactor := manager.Must(trmpgx.NewDefaultFactory(pool))
@@ -56,11 +60,12 @@ func Run() {
 		panic(err)
 	}
 
-	lgr.Info("Server is running", zap.String("port", cfg.ServerConfig.Port))
-	if err := http.ListenAndServe(
-		fmt.Sprintf(":%s", cfg.ServerConfig.Port),
-		server,
-	); err != nil {
-		panic(err)
-	}
+	// запустите выполнение тестов из директории cases с записью в отчет Allure
+	runner.RunWithTesting(t, &runner.RunWithTestingParams{
+		Server:      httptest.NewServer(server),
+		TestsDir:    "cases",
+		DB:          stdlib.OpenDBFromPool(pool),
+		DbType:      fixtures.Postgres,
+		FixturesDir: "fixtures",
+	})
 }

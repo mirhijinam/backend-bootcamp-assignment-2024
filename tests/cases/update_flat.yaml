@@ -1,0 +1,144 @@
+- name: UpdateStatusFromOnModerationToApproved
+  description: КОГДА модератор обновляет статус квартиры ДОЛЖЕН обновиться статус квартиры 
+  method: POST
+  path: "/flat/update"
+  headers:
+    "Authorization": "{{ $token }}"
+  variables:
+    "house_id": 1
+    "token": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTU1NTk5OTQsImlhdCI6MTcyNDAyMzk5NCwiVXNlciI6eyJJRCI6ImUzOTI4NmU3LWIxOTQtNDEyMy05NGZiLWM2OTI2MDM0NWY0MCIsIlJvbGUiOiJtb2RlcmF0b3IifX0.cKdWpuAnbnE7Me3Yn9AvF-UkjcrYlqw1hXmvepmxBDI"
+  fixtures:
+    - fixtures
+  comparisonParams:
+    disallowExtraFields: true
+    ignoreArraysOrdering: true
+  request: |
+    {
+      "id": 2,
+      "house_id": 1,
+      "status": "approved"
+    }
+  response:
+    200: |
+      {
+        "id": 2,
+        "house_id": 1,
+        "price": 1000,
+        "rooms": 1,
+        "status": "approved"
+      }
+  dbQuery: |
+    SELECT status FROM flats WHERE house_id = 1 AND flat_number = 2
+  dbResponse:
+    - '{"status": "approved"}'
+
+- name: TryUpdateFlatStatusByClient
+  description: КОГДА клиент пытается обновить статус квартиры НЕ ДОЛЖЕН обновиться статус квартиры и ДОЛЖЕН вернуться ответ с http-статусом 401
+  method: POST
+  path: "/flat/update"
+  headers:
+    "Authorization": "{{ $token }}"
+  variables:
+    "house_id": 1
+    "token": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTU1NjAwOTksImlhdCI6MTcyNDAyNDA5OSwiVXNlciI6eyJJRCI6ImVjNGVjYTc2LWJkOGQtNDYwMi05OGRjLTc4NGM1Njg5NzlhOCIsIlJvbGUiOiJjbGllbnQifX0.Csysv92YBvcqY8mTaFGQPug68Ktlykn1yHTG_9znKrg"
+  fixtures:
+    - fixtures
+  request: |
+    {
+      "id": 1,
+      "house_id": 1,
+      "status": "on moderation"
+    }
+  response:
+    401:
+  dbQuery: |
+    SELECT status FROM flats WHERE house_id = 1 AND flat_number = 1
+  dbResponse:
+    - '{"status": "created"}'
+
+- name: TryUpdateFlatOfAnotherModerator
+  description: КОГДА модератор пытается обновить статус квартиры, которая на модерации другого модератора,
+   НЕ ДОЛЖЕН обновиться статус квартиры и
+   ДОЛЖЕН вернуться ответ с ошибкой
+  method: POST
+  path: "/flat/update"
+  headers:
+    "Authorization": "{{ $token }}"
+  variables:
+    "house_id": 1
+    "token": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTU1NTk5OTQsImlhdCI6MTcyNDAyMzk5NCwiVXNlciI6eyJJRCI6ImUzOTI4NmU3LWIxOTQtNDEyMy05NGZiLWM2OTI2MDM0NWY0MCIsIlJvbGUiOiJtb2RlcmF0b3IifX0.cKdWpuAnbnE7Me3Yn9AvF-UkjcrYlqw1hXmvepmxBDI"
+  fixtures:
+    - fixtures
+  request: |
+    {
+      "id": 3,
+      "house_id": 1,
+      "status": "on moderation"
+    }
+  response:
+    400: |
+      {
+        "message": "Квартира уже на модерации"
+      }
+  dbQuery: |
+    SELECT status FROM flats WHERE house_id = 1 AND flat_number = 3
+  dbResponse:
+    - '{"status": "on_moderation"}'
+
+- name: TryUpdateAlreadyModeratedFlat
+  description: КОГДА модератор пытается обновить статус квартиры, которая уже прошла модерацию,
+   НЕ ДОЛЖЕН обновиться статус квартиры и
+   ДОЛЖЕН вернуться ответ с ошибкой
+  method: POST
+  path: "/flat/update"
+  headers:
+    "Authorization": "{{ $token }}"
+  variables:
+    "house_id": 1
+    "token": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTU1NTk5OTQsImlhdCI6MTcyNDAyMzk5NCwiVXNlciI6eyJJRCI6ImUzOTI4NmU3LWIxOTQtNDEyMy05NGZiLWM2OTI2MDM0NWY0MCIsIlJvbGUiOiJtb2RlcmF0b3IifX0.cKdWpuAnbnE7Me3Yn9AvF-UkjcrYlqw1hXmvepmxBDI"
+  fixtures:
+    - fixtures
+  request: |
+    {
+      "id": 4,
+      "house_id": 1,
+      "status": "on moderation"
+    }
+  response:
+    400: |
+      {
+        "message": "Квартира уже прошла модерацию"
+      }
+  dbQuery: |
+    SELECT status FROM flats WHERE house_id = 1 AND flat_number = 4
+  dbResponse:
+    - '{"status": "approved"}'
+
+- name: TryUpdateFlatStatusFromCreatedToApproved
+  description: КОГДА модератор пытается поменять статус квартиры с created на approved 
+   НЕ ДОЛЖЕН обновиться статус квартиры и
+   ДОЛЖЕН вернуться ответ с ошибкой
+  method: POST
+  path: "/flat/update"
+  headers:
+    "Authorization": "{{ $token }}"
+  variables:
+    "house_id": 1
+    "token": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTU1NTk5OTQsImlhdCI6MTcyNDAyMzk5NCwiVXNlciI6eyJJRCI6ImUzOTI4NmU3LWIxOTQtNDEyMy05NGZiLWM2OTI2MDM0NWY0MCIsIlJvbGUiOiJtb2RlcmF0b3IifX0.cKdWpuAnbnE7Me3Yn9AvF-UkjcrYlqw1hXmvepmxBDI"
+  fixtures:
+    - fixtures
+  request: |
+    {
+      "id": 1,
+      "house_id": 1,
+      "status": "approved"
+    }
+  response:
+    400: |
+      {
+        "message": "Невалидный статус перехода"
+      }
+  dbQuery: |
+    SELECT status FROM flats WHERE house_id = 1 AND flat_number = 1
+  dbResponse:
+    - '{"status": "created"}'

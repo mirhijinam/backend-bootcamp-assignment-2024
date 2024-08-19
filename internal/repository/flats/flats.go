@@ -33,8 +33,6 @@ func (r Repo) Create(
 ) (models.Flat, error) {
 	const op = `repo.Flats.Create`
 
-	// todo: удостовериться, что у нас не будет состояния гонки при попытке задать номер для квартиры
-
 	builder := r.builder.
 		Insert("flats").
 		Columns(
@@ -138,7 +136,8 @@ func (r Repo) Get(
 		Where(sq.Eq{
 			"house_id":    houseId,
 			"flat_number": number,
-		})
+		}).
+		Suffix("FOR UPDATE")
 
 	sql, args, err := builder.ToSql()
 	if err != nil {

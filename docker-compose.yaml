@@ -1,18 +1,18 @@
 services:
-  app:
-    container_name: avito_app
-    build: "."
-    ports:
-      - "${HTTP_PORT}:${HTTP_PORT}"
-    restart: on-failure:5
-    tty: true
-    stdin_open: true
-    env_file:
-      - .env
-    depends_on:
-      - postgres
-    networks:
-      - avito_network
+  # app:
+  #   container_name: avito_app
+  #   build: "."
+  #   ports:
+  #     - "${HTTP_PORT}:${HTTP_PORT}"
+  #   restart: on-failure:5
+  #   tty: true
+  #   stdin_open: true
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - avito_network
 
   postgres:
     container_name: avito_postgres

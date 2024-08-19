@@ -15,13 +15,15 @@ type service interface {
 }
 
 type API struct {
-	logger  *zap.Logger
-	service service
+	logger    *zap.Logger
+	service   service
+	secretKey string
 }
 
-func New(service service, logger *zap.Logger) API {
+func New(service service, logger *zap.Logger, secretKey string) API {
 	return API{
-		service: service,
-		logger:  logger,
+		service:   service,
+		logger:    logger,
+		secretKey: secretKey,
 	}
 }

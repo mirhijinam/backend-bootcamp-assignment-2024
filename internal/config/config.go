@@ -27,6 +27,7 @@ type ServerConfig struct {
 	Port        string `env:"HTTP_PORT" envDefault:"8080"`
 	Timeout     string `env:"TIMEOUT" envDefault:"5s"`
 	IdleTimeout string `env:"IDLE_TIMEOUT" envDefault:"30s"`
+	SecretKey   string `env:"SECRET_KEY,notEmpty"`
 }
 
 type LoggerConfig struct {

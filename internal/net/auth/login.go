@@ -13,6 +13,8 @@ import (
 	"go.uber.org/zap"
 )
 
+const expirationTime = 15 * time.Minute
+
 func (api API) LoginPost(
 	ctx context.Context,
 	req generated.OptLoginPostReq,
@@ -37,7 +39,7 @@ func (api API) LoginPost(
 		},
 	})
 
-	tokenString, err := token.SignedString([]byte("secret"))
+	tokenString, err := token.SignedString([]byte(api.secretKey))
 	if err != nil {
 		api.logger.Error("failed to create token string", zap.Error(err))
 		return nil, err

@@ -40,7 +40,13 @@ func (api API) FlatUpdatePost(
 
 		if errors.Is(err, flats.ErrAnotherModerating) {
 			return &generated.R400{
-				Message: "Квартира уже в модерации",
+				Message: "Квартира уже на модерации",
+			}, nil
+		}
+
+		if errors.Is(err, flats.ErrInvalidTransition) {
+			return &generated.R400{
+				Message: "Невалидный статус перехода",
 			}, nil
 		}
 

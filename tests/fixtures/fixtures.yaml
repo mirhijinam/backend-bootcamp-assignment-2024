@@ -1,0 +1,48 @@
+tables:
+  houses:
+    - id: 1
+      developer: NULL
+      address: "Улица Пушкина, дом Колотушкина"
+      year: 1980
+      created_at: "2016-01-01 12:30:12"
+      update_at: "2016-03-01 12:30:12"
+  users:
+    - id: "e39286e7-b194-4123-94fb-c69260345f40"
+      email: "moderator@mail.ru"
+      password: "password"
+      role: "moderator"
+    - id: "ec4eca76-bd8d-4602-98dc-784c568979a8"
+      email: "client@mail.ru"
+      password: "password"
+      role: "client"
+  flats:
+    - flat_number: 1
+      house_id: 1
+      price: 1000
+      rooms: 1
+      status: "created"
+      moderator_id: NULL
+    - flat_number: 2
+      house_id: 1
+      price: 1000
+      rooms: 1
+      status: "on_moderation"
+      moderator_id: "e39286e7-b194-4123-94fb-c69260345f40"
+    - flat_number: 3
+      house_id: 1
+      price: 1000
+      rooms: 1
+      status: "on_moderation"
+      moderator_id: "67c38af2-a960-4c94-abb5-b06676c7ad51"
+    - flat_number: 4
+      house_id: 1
+      price: 2000
+      rooms: 1
+      status: "approved"
+      moderator_id: "e39286e7-b194-4123-94fb-c69260345f40"
+    - flat_number: 5
+      house_id: 1
+      price: 3000
+      rooms: 1
+      status: "declined"
+      moderator_id: "e39286e7-b194-4123-94fb-c69260345f40"

@@ -1,0 +1,82 @@
+- name: Successfully get flat by house id by moderator
+  description: КОГДА модератор запрашивает список квартир ДОЛЖЕН возвращаться полный список квартир дома
+  method: GET
+  path: "/house/{{ $house_id }}"
+  headers:
+    "Authorization": "{{ $token }}"
+  variables:
+    "house_id": 1
+    "token": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTU1NTk5OTQsImlhdCI6MTcyNDAyMzk5NCwiVXNlciI6eyJJRCI6ImUzOTI4NmU3LWIxOTQtNDEyMy05NGZiLWM2OTI2MDM0NWY0MCIsIlJvbGUiOiJtb2RlcmF0b3IifX0.cKdWpuAnbnE7Me3Yn9AvF-UkjcrYlqw1hXmvepmxBDI"
+  fixtures:
+    - fixtures
+  comparisonParams:
+    disallowExtraFields: true
+    ignoreArraysOrdering: true
+  response:
+    200: |
+      {
+        "flats": [
+          {
+            "id": 1,
+            "house_id": 1,
+            "price": 1000,
+            "rooms": 1,
+            "status": "created"
+          },
+          {
+            "id": 2,
+            "house_id": 1,
+            "price": 1000,
+            "rooms": 1,
+            "status": "on_moderation"
+          },
+          {
+            "id": 3,
+            "house_id": 1,
+            "price": 1000,
+            "rooms": 1,
+            "status": "on_moderation"
+          },
+          {
+            "id": 4,
+            "house_id": 1,
+            "price": 2000,
+            "rooms": 1,
+            "status": "approved"
+          },
+          {
+            "id": 5,
+            "house_id": 1,
+            "price": 3000,
+            "rooms": 1,
+            "status": "declined"
+          }
+        ]
+      }
+- name: Successfully get flat by house id by client
+  description: КОГДА клиент запрашивает список квартир ДОЛЖЕН возвращаться список квартир дома со статусом 'approved'
+  method: GET
+  path: "/house/{{ $house_id }}"
+  headers:
+    "Authorization": "{{ $token }}"
+  variables:
+    "house_id": 1
+    "token": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTU1NjAwOTksImlhdCI6MTcyNDAyNDA5OSwiVXNlciI6eyJJRCI6ImVjNGVjYTc2LWJkOGQtNDYwMi05OGRjLTc4NGM1Njg5NzlhOCIsIlJvbGUiOiJjbGllbnQifX0.Csysv92YBvcqY8mTaFGQPug68Ktlykn1yHTG_9znKrg"
+  fixtures:
+    - fixtures
+  comparisonParams:
+    disallowExtraFields: true
+    ignoreArraysOrdering: true
+  response:
+    200: |
+      {
+        "flats": [
+          {
+            "id": 4,
+            "house_id": 1,
+            "price": 2000,
+            "rooms": 1,
+            "status": "approved"
+          }
+        ]
+      }
