@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	ErrAnotherModerating = errors.New("another moderating")
 	ErrAlreadyModerated  = errors.New("already moderated")
+	ErrAnotherModerating = errors.New("another moderating")
 	ErrInvalidTransition = errors.New("invalid flat status transition")
 )
 

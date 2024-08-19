@@ -37,7 +37,9 @@ func (api API) FlatCreatePost(
 		}
 
 		api.logger.Error("failed to create flat", zap.Error(err))
-		return nil, err
+		return &generated.R5xx{
+			Message: err.Error(),
+		}, nil
 	}
 
 	return &generated.Flat{

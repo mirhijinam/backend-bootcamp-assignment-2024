@@ -50,7 +50,9 @@ func (api API) FlatUpdatePost(
 			}, nil
 		}
 
-		return nil, err
+		return &generated.R5xx{
+			Message: err.Error(),
+		}, nil
 	}
 
 	return &generated.Flat{

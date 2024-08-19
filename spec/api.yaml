@@ -300,12 +300,6 @@ components:
       description: Неавторизованный доступ
     5xx:
       description: Ошибка сервера
-      headers:
-        Retry-After:
-          description: Время, через которое еще раз нужно сделать запрос
-          required: false
-          schema:
-            type: integer
       content:
         application/json:
           schema:

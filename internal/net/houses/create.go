@@ -25,7 +25,9 @@ func (api API) HouseCreatePost(
 
 	if err != nil {
 		api.logger.Error("failed to create house", zap.Error(err))
-		return nil, err
+		return &generated.R5xx{
+			Message: err.Error(),
+		}, nil
 	}
 
 	return &generated.House{

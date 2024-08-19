@@ -1,9 +1,9 @@
 services:
   postgres:
-    container_name: avito_postgres
+    container_name: avito_postgres_test
     image: postgres:15.2-alpine
     ports:
-      - 5433:5432
+      - 5434:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -16,24 +16,24 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - avito_network
+      - avito_network_test
 
   migrate:
-    container_name: avito_migrate
+    container_name: avito_migrate_test
     image: migrate/migrate
     volumes:
-      - ./db/migrations:/migrations
+      - ../db/migrations:/migrations
     command: [ "-path", "/migrations", "-database", "postgres://${PGUSER}:${PGPASSWORD}@postgres/${PGDATABASE}?sslmode=${PGSSLMODE}", "up" ]
     depends_on:
       postgres:
         condition: service_healthy
     networks:
-      - avito_network
+      - avito_network_test
 
 volumes:
   postgres_data:
 
 networks:
-  avito_network:
-    name: avito_network
+  avito_network_test:
+    name: avito_network_test
     driver: bridge

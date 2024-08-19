@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS idx_flats_house_id_status;

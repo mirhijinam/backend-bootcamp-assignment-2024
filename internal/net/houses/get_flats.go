@@ -2,7 +2,6 @@ package houses
 
 import (
 	"context"
-	"errors"
 
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/generated"
 	"github.com/mirhijinam/backend-bootcamp-assignment-2024/internal/models"
@@ -16,7 +15,9 @@ func (api API) HouseIDGet(
 ) (r generated.HouseIDGetRes, _ error) {
 	user, ok := ctx.Value(middleware.User).(models.UserClaims)
 	if !ok {
-		return nil, errors.New("failed to get user from context")
+		return &generated.R5xx{
+			Message: "failed to get user from context",
+		}, nil
 	}
 
 	api.logger.Info("flat list requester (info from context):", zap.Any("userID", user.ID), zap.Any("userRole", user.Role))
@@ -24,7 +25,9 @@ func (api API) HouseIDGet(
 	intermediateFlats, err := api.service.GetFlatsByHouseId(ctx, int(params.ID), models.Role(user.Role))
 	if err != nil {
 		api.logger.Error("failed to get flats by the houseId", zap.Error(err))
-		return nil, err
+		return &generated.R5xx{
+			Message: err.Error(),
+		}, nil
 	}
 
 	flats := make([]generated.Flat, 0, len(intermediateFlats))

@@ -1,18 +1,33 @@
 _COMPOSE=docker compose -f docker-compose.yaml --env-file .env -p avito-bootcamp-backend
+_COMPOSE_TEST=docker compose -f tests/docker-compose-test.yaml --env-file tests/.env -p avito-bootcamp-backend-test
 
 up:
 	@echo "Starting Docker images..."
 	${_COMPOSE} up
 
+up_test:
+	@echo "Starting Docker images..."
+	${_COMPOSE_TEST} up
+	
 build:
 	@echo "Building Docker images..."
 	${_COMPOSE} build
 
+build_test:
+	@echo "Building Docker images..."
+	${_COMPOSE_TEST} build
+
 down:
-	${_COMPOSE} down
+	${_COMPOSE} down -v
+
+down_test:
+	${_COMPOSE_TEST} down -v
 
 clean:
 	${_COMPOSE} down --remove-orphans -v --rmi all
+
+clean_test:
+	${_COMPOSE_TEST} down --remove-orphans -v --rmi all
 
 generate:
 	go generate ./...

@@ -1082,40 +1082,14 @@ func (s *R5xx) SetCode(val OptInt) {
 	s.Code = val
 }
 
-// R5xxHeaders wraps R5xx with response headers.
-type R5xxHeaders struct {
-	RetryAfter OptInt
-	Response   R5xx
-}
-
-// GetRetryAfter returns the value of RetryAfter.
-func (s *R5xxHeaders) GetRetryAfter() OptInt {
-	return s.RetryAfter
-}
-
-// GetResponse returns the value of Response.
-func (s *R5xxHeaders) GetResponse() R5xx {
-	return s.Response
-}
-
-// SetRetryAfter sets the value of RetryAfter.
-func (s *R5xxHeaders) SetRetryAfter(val OptInt) {
-	s.RetryAfter = val
-}
-
-// SetResponse sets the value of Response.
-func (s *R5xxHeaders) SetResponse(val R5xx) {
-	s.Response = val
-}
-
-func (*R5xxHeaders) dummyLoginGetRes()        {}
-func (*R5xxHeaders) flatCreatePostRes()       {}
-func (*R5xxHeaders) flatUpdatePostRes()       {}
-func (*R5xxHeaders) houseCreatePostRes()      {}
-func (*R5xxHeaders) houseIDGetRes()           {}
-func (*R5xxHeaders) houseIDSubscribePostRes() {}
-func (*R5xxHeaders) loginPostRes()            {}
-func (*R5xxHeaders) registerPostRes()         {}
+func (*R5xx) dummyLoginGetRes()        {}
+func (*R5xx) flatCreatePostRes()       {}
+func (*R5xx) flatUpdatePostRes()       {}
+func (*R5xx) houseCreatePostRes()      {}
+func (*R5xx) houseIDGetRes()           {}
+func (*R5xx) houseIDSubscribePostRes() {}
+func (*R5xx) loginPostRes()            {}
+func (*R5xx) registerPostRes()         {}
 
 // RegisterPostBadRequest is response for RegisterPost operation.
 type RegisterPostBadRequest struct{}
